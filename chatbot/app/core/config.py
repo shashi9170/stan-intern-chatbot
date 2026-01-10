@@ -6,6 +6,12 @@ from dotenv import load_dotenv # type: ignore
 load_dotenv()
 
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "CHANGE_ME")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+
+JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", 60))
+
+
 # API Keys for multiple LLM providers
 API_KEYS = {
    "huggingface": os.getenv("HUGGINGFACE_API_KEY"),
@@ -24,8 +30,10 @@ ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
+MONGODB_URI = os.getenv("MONGODB_URI",)
 
-ASYNC_DATABASE_URL = os.getenv("ASYNC_DATABASE_URL")
+MONGODB_DB_NAME = "chat_app"
+
 
 # System prompt for chatbot
 SYSTEM_PROMPT = """

@@ -2,7 +2,6 @@ from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace # type: i
 from app.core.config import API_KEYS, BASE_URLS
 from app.models.base_model import BaseChatModel
 
-
 class LlamaModel(BaseChatModel):
     def __init__(self):
         self.llm = HuggingFaceEndpoint(
@@ -12,8 +11,12 @@ class LlamaModel(BaseChatModel):
         )
         self.model = ChatHuggingFace(llm=self.llm)
 
-    def get_response(self, messages):
-        return self.model.invoke(messages)
+    async def get_response(self, messages):
+        """
+        Async method for non-streaming responses (Titles, Prompt Refinement).
+        Using ainvoke prevents blocking the server.
+        """
+        return await self.model.ainvoke(messages)
 
     async def stream_response(self, messages):
         """Async generator for FastAPI streaming"""

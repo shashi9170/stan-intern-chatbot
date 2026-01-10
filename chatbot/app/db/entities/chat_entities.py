@@ -1,17 +1,14 @@
-import datetime
-import uuid
-from sqlalchemy import Column, Text, DateTime # type: ignore
-from sqlalchemy.dialects.postgresql import UUID # type: ignore
-from sqlalchemy.orm import relationship # type: ignore
-from .base_entities import Base 
+from uuid import uuid4
+from datetime import datetime
 
-class Chat(Base):
-    __tablename__ = "chats"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), nullable=False)
-    title = Column(Text, nullable=True)
-    active_branch_id = Column(UUID(as_uuid=True), nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
-
-    branches = relationship("Branch", back_populates="chat")
+def chat_document(user_id: str, title: str = "New Chat") -> dict:
+    """
+    Create a new chat document with default title and timestamp.
+    """
+    return {
+        "_id": str(uuid4()),
+        "user_id": user_id,
+        "title": title,
+        "active_branch_id": None,  # will be set after branch creation
+        "created_at": datetime.utcnow()
+    }
