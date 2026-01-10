@@ -1,5 +1,5 @@
 from app.schema.chat_schema import ChatRequest
-from app.models.base_model import ModelFactory
+from app.models.model_factory import ModelFactory
 from app.core.config import SYSTEM_PROMPT
 
 async def chat_stream(request: ChatRequest, model: str = "llama"):

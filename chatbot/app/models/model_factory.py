@@ -1,6 +1,6 @@
 from typing import Dict, Type
-from chatbot.models.base_model import BaseChatModel
-from chatbot.models.llama_model import LlamaModel
+from app.models.base_model import BaseChatModel
+from app.models.llama_model import LlamaModel
 
 class ModelFactory:
     """

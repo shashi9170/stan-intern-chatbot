@@ -1,6 +1,6 @@
 from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace # type: ignore
 from app.core.config import API_KEYS, BASE_URLS
-from chatbot.models.base_model import BaseChatModel
+from app.models.base_model import BaseChatModel
 
 
 class LlamaModel(BaseChatModel):
