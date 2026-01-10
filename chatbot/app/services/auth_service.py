@@ -30,3 +30,22 @@ class AuthService:
 
         token = create_access_token(user["_id"])
         return token
+
+
+    @staticmethod
+    async def get_user_profile(user_id: str) -> dict:
+        """
+        Fetch user details by ID.
+        """
+        user = await users_collection.find_one({"_id": user_id})
+        
+        if not user:
+            return None
+            
+        return {
+            "id": user["_id"],
+            "username": user.get("username"),
+            "email": user.get("email"),
+            "plan": user.get("plan", "Free"),  
+            "created_at": user.get("created_at")
+        }

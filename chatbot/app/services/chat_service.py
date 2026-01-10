@@ -92,3 +92,37 @@ class ChatService:
             "title": chat.get("title", "New Chat"),
             "messages": messages
         }
+        
+        
+    @staticmethod
+    async def get_chat_by_id(chat_id: str, user_id: str) -> dict:
+        """
+        Fetch a specific chat by ID and return details + messages.
+        Returns None if chat doesn't exist or doesn't belong to user.
+        """
+        # 1. Find the chat AND verify ownership
+        chat = await chats_collection.find_one({"_id": chat_id, "user_id": user_id})
+        
+        if not chat:
+            return None
+
+        branch_id = chat["active_branch_id"]
+
+        # 2. Fetch messages for the active branch
+        msg_cursor = messages_collection.find(
+            {"branch_id": branch_id},
+            {"role": 1, "content": 1, "created_at": 1, "_id": 0} # Hide internal IDs
+        ).sort("created_at", 1) # Oldest first
+        
+        messages = await msg_cursor.to_list(length=None)
+
+        # 3. Role mapping (bot -> assistant) for frontend compatibility
+        for msg in messages:
+            if msg["role"] == "bot":
+                msg["role"] = "assistant"
+
+        return {
+            "chat_id": str(chat["_id"]),
+            "title": chat.get("title", "New Chat"),
+            "messages": messages
+        }

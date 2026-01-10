@@ -3,7 +3,7 @@ from typing import List, Optional, Literal
 from datetime import datetime
 
 class ChatMessage(BaseModel):
-    role: Literal["human", "bot"]
+    role: Literal["human", "bot", "user", "assistant"]
     content: str
     parent_message_id: Optional[str] = None
     timestamp: datetime = datetime.utcnow()

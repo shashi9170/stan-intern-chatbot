@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Response, HTTPException # type: ignore
+from fastapi import APIRouter, Depends, Response, HTTPException # type: ignore
 from app.services.auth_service import AuthService
 from app.schema.auth_schema import RegisterRequest, LoginRequest
+from app.api.dependencies import get_current_user
 
 auth_router = APIRouter()
 
@@ -12,7 +13,8 @@ async def register(data: RegisterRequest, response: Response):
             key="access_token",
             value=token,
             httponly=True,
-            samesite="lax",
+            samesite="lax", 
+            secure=False 
         )
         return {"message": "User registered successfully"}
     except ValueError as e:
@@ -28,8 +30,21 @@ async def login(data: LoginRequest, response: Response):
             key="access_token",
             value=token,
             httponly=True,
-            samesite="lax",
+            samesite="lax", 
+            secure=False 
         )
         return {"message": "Login successful"}
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
+
+@auth_router.get("/me")
+async def get_current_user_profile(user_id: str = Depends(get_current_user)):
+    """
+    Get the currently logged-in user's profile.
+    """
+    user_data = await AuthService.get_user_profile(user_id)
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    return user_data

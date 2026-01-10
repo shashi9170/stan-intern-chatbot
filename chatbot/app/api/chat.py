@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, BackgroundTasks # type: ignore
+from fastapi import APIRouter, Depends, Query, HTTPException, BackgroundTasks # type: ignore
 from fastapi.responses import StreamingResponse # type: ignore
 from app.api.dependencies import get_current_user
 from app.schema.chat_schema import ChatRequest
@@ -30,6 +30,22 @@ async def get_latest_chat(user_id: str = Depends(get_current_user)):
     return {"status": "success", "data": chat_data}
 
 
+@chat_router.get("/{chat_id}")
+async def get_specific_chat(
+    chat_id: str, 
+    user_id: str = Depends(get_current_user)
+):
+    """
+    Load a specific chat session by ID.
+    """
+    chat_data = await ChatService.get_chat_by_id(chat_id, user_id)
+    
+    if not chat_data:
+        raise HTTPException(status_code=404, detail="Chat not found or access denied")
+        
+    return {"status": "success", "data": chat_data}
+
+
 @chat_router.post("/stream")
 async def stream_chat(
     request: ChatRequest,
@@ -37,6 +53,7 @@ async def stream_chat(
     chat_id: str = Query(None, description="Optional chat ID to resume"),
     user_id: str = Depends(get_current_user)
 ):
+    print(request)
     return StreamingResponse(
         chat_stream(request, user_id, background_tasks, chat_id=chat_id),
         media_type="text/plain"
