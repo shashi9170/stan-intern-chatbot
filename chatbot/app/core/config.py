@@ -25,6 +25,7 @@ ORIGINS = [
 ]
 
 
+ASYNC_DATABASE_URL = os.getenv("ASYNC_DATABASE_URL")
 
 # System prompt for chatbot
 SYSTEM_PROMPT = """
