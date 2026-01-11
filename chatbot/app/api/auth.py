@@ -13,9 +13,10 @@ async def register(data: RegisterRequest, response: Response):
             key="access_token",
             value=token,
             httponly=True,
-            samesite="lax", 
-            secure=False 
+            samesite="none",
+            secure=True
         )
+
         return {"message": "User registered successfully"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -30,9 +31,10 @@ async def login(data: LoginRequest, response: Response):
             key="access_token",
             value=token,
             httponly=True,
-            samesite="lax", 
-            secure=False 
+            samesite="none",
+            secure=True
         )
+
         return {"message": "Login successful"}
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
