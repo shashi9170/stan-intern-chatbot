@@ -1,26 +1,40 @@
-from typing import TypedDict
+from typing import TypedDict, List
 from langgraph.graph import StateGraph, END # type: ignore
 from app.models.model_factory import ModelFactory
 
 class GraphState(TypedDict):
     original_input: str
+    chat_history: List[str]
     refined_prompt: str
 
 async def refine_prompt_node(state: GraphState):
     model = ModelFactory.get("llama")
     
+    # Format history for the prompt
+    history_text = "\n".join(state["chat_history"])
+    
     system_prompt = (
-        "You are an expert Prompt Engineer. "
-        "Refine the user's input to be clear and precise. "
-        "Return ONLY the refined prompt text."
+        "You are a Context Refiner. Your job is to rewrite the 'Latest User Input' "
+        "into a standalone question based on the 'Chat History'.\n"
+        "If the input relies on context (e.g. 'What is it?', 'Tell me more'), "
+        "replace pronouns with specific entities from history.\n"
+        "If the input is already clear, return it unchanged.\n"
+        "Return ONLY the refined text."
     )
+    
+    user_message = f"""
+    --- Chat History ---
+    {history_text}
+    
+    --- Latest User Input ---
+    {state["original_input"]}
+    """
     
     messages = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": state["original_input"]}
+        {"role": "user", "content": user_message}
     ]
     
-    # Await the async response
     response = await model.get_response(messages)
     return {"refined_prompt": response.content}
 
